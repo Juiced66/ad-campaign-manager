@@ -5,6 +5,7 @@ from app.infrastructure.database.sql_alchemy.models.base import Base
 
 
 class User(Base):
+    """SQLAlchemy model representing the 'users' table."""
     __tablename__ = "users"
 
     email: Mapped[str] = mapped_column(

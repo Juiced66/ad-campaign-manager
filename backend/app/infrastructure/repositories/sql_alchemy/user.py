@@ -11,10 +11,11 @@ from app.infrastructure.repositories.sql_alchemy.base import SQLAlchemyBaseRepos
 class SQLAlchemyUserRepository(
     SQLAlchemyBaseRepository[UserModel, User], IUserRepository
 ):
+    """SQLAlchemy implementation of the User Repository interface."""
     def __init__(self, db: Session):
         super().__init__(db, UserModel, User)
 
-    def get_by_email(self, email: str) -> Optional[User]:
+    def get_by_email(self, *, email: str) -> Optional[User]:
         db_obj = self.db.query(self.model).filter(self.model.email == email).first()
         return self._to_entity(db_obj)
 

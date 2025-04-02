@@ -15,6 +15,7 @@ from app.infrastructure.repositories.sql_alchemy.base import SQLAlchemyBaseRepos
 class CampaignSqlAlchemyRepository(
     SQLAlchemyBaseRepository[CampaignModel, Campaign], ICampaignRepository
 ):
+    """SQLAlchemy implementation of the Campaign Repository interface."""
     def __init__(self, db: Session):
         super().__init__(db, CampaignModel, Campaign)
 

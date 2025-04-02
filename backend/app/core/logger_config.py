@@ -5,6 +5,7 @@ import os
 
 
 def setup_logging():
+    """Configures application-wide logging."""
     logging_config = {
         "version": 1,
         "disable_existing_loggers": False,

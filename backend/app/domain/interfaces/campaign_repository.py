@@ -7,6 +7,7 @@ from app.domain.interfaces.base_repository import IRepository
 
 
 class ICampaignRepository(IRepository[Campaign]):
+    """Interface for Campaign data persistence operations."""
     @abstractmethod
     def get_multi_filtered(
         self,
@@ -16,4 +17,5 @@ class ICampaignRepository(IRepository[Campaign]):
         is_active: Optional[bool] = None,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
-    ) -> List[Campaign]: ...
+    ) -> List[Campaign]:
+        """Retrieves multiple campaigns with optional filtering."""

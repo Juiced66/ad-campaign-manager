@@ -12,8 +12,6 @@ logger = logging.getLogger(__name__)
 class TokenError(Exception):
     """Custom exception for token related errors."""
 
-    pass
-
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verifies a plain password against a hashed password."""
@@ -57,9 +55,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
         )
         return token
     except Exception as e:
-        logger.error(f"Error encoding token: {e}")
-        raise TokenError("Could not create access token")
-
+        logger.error("Error encoding token: %s", e, exc_info=True)
+        raise TokenError("Could not create access token") from e
 
 def decode_access_token(token: str) -> dict:
     """
@@ -80,5 +77,5 @@ def decode_access_token(token: str) -> dict:
         )
         return payload
     except JWTError as e:
-        logger.error(f"Token decode error: {e}")
-        raise TokenError("Invalid token")
+        logger.error("Token decode error: %s", e, exc_info=True)
+        raise TokenError("Invalid token") from e

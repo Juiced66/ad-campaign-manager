@@ -2,6 +2,7 @@ from datetime import date
 
 
 class Campaign:
+    """Represents an advertising campaign within the domain."""
     def __init__(
         self,
         name: str,

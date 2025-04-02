@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """Application settings loaded from environment variables."""
     API_V1_STR: str = "/api/v1"
     AUTH_SECRET_KEY: str
     AUTH_ALGORITHM: str = "HS256"

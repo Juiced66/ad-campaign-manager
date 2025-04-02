@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 
 class AccessTokenData:
+    """Represents access token details within the domain."""
     def __init__(
         self,
         access_token: str,

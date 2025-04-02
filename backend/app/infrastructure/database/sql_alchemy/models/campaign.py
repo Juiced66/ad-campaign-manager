@@ -7,6 +7,7 @@ from app.infrastructure.database.sql_alchemy.models.base import Base
 
 
 class Campaign(Base):
+    """SQLAlchemy model representing the 'campaigns' table."""
     __tablename__ = "campaigns"
 
     name: Mapped[str] = mapped_column(String(255), index=True, nullable=False)

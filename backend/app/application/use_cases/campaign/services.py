@@ -50,8 +50,8 @@ def update_campaign(
 
     if updated_db_obj:
         return CampaignSchema.model_validate(updated_db_obj)
-    else:
-        return None
+    
+    return None
 
 
 def delete_campaign(repo: ICampaignRepository, campaign_id: int) -> Optional[Campaign]:

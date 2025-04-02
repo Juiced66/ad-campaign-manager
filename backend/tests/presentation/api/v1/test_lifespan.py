@@ -29,6 +29,5 @@ def test_lifespan_startup_calls_init_db(mocker):
     try:
         with TestClient(fastapi_app) as client:
             mock_init_db.assert_called_once()
-
     finally:
         pass

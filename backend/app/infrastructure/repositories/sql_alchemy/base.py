@@ -10,6 +10,7 @@ EntityType = TypeVar("EntityType")
 
 
 class SQLAlchemyBaseRepository(Generic[ModelType, EntityType], IRepository[EntityType]):
+    """Base class for SQLAlchemy repository implementations."""
     def __init__(
         self, db: Session, model: Type[ModelType], entity_cls: Type[EntityType]
     ):
@@ -36,7 +37,7 @@ class SQLAlchemyBaseRepository(Generic[ModelType, EntityType], IRepository[Entit
         db_obj = self.db.query(self.model).filter(self.model.id == id).first()
         return self._to_entity(db_obj)
 
-    def get_multi(self, skip: int = 0, limit: int = 100) -> List[EntityType]:
+    def get_multi(self, *, skip: int = 0, limit: int = 100) -> List[EntityType]:
         db_objs = self.db.query(self.model).offset(skip).limit(limit).all()
         return [self._to_entity(obj) for obj in db_objs if obj is not None]
 

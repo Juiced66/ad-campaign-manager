@@ -7,6 +7,7 @@ from app.infrastructure.database.sql_alchemy.models.base import Base
 
 
 class Token(Base):
+    """SQLAlchemy model representing the 'tokens' table for auth tracking."""
     __tablename__ = "tokens"
 
     token: Mapped[str] = mapped_column(String, index=True, unique=True)

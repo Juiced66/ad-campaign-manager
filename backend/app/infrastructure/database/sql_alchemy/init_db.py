@@ -19,14 +19,14 @@ def init_db(db: Session) -> None:
 
     if not settings.FIRST_SUPERUSER_EMAIL or not settings.FIRST_SUPERUSER_PASSWORD:
         logger.info(
-            "Skipping superuser creation: FIRST_SUPERUSER_EMAIL or FIRST_SUPERUSER_PASSWORD not set in .env"
+            "Skipping superuser creation: FIRST_SUPERUSER_EMAIL or FIRST_SUPERUSER_PASSWORD missing .env"
         )
         return
     repo = SQLAlchemyUserRepository(db)
     user = user_service.get_user_by_email(repo, email=settings.FIRST_SUPERUSER_EMAIL)
 
     if not user:
-        logger.info(f"Creating superuser: {settings.FIRST_SUPERUSER_EMAIL}")
+        logger.info("Creating superuser: %s", settings.FIRST_SUPERUSER_EMAIL)        
         try:
             user_in = UserCreate(
                 email=settings.FIRST_SUPERUSER_EMAIL,
@@ -38,10 +38,14 @@ def init_db(db: Session) -> None:
             logger.info("Superuser created successfully.")
         except Exception as e:
             logger.error(
-                f"Failed to create superuser {settings.FIRST_SUPERUSER_EMAIL}: {e}"
+                "Failed to create superuser %s: %s",
+                settings.FIRST_SUPERUSER_EMAIL,
+                e,
+                exc_info=True
             )
             db.rollback()
     else:
         logger.info(
-            f"Superuser {settings.FIRST_SUPERUSER_EMAIL} already exists. Skipping creation."
+            "Superuser %s already exists. Skipping creation.",
+            settings.FIRST_SUPERUSER_EMAIL,
         )

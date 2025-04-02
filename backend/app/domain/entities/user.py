@@ -1,4 +1,5 @@
 class User:
+    """Represents a user within the domain."""
     def __init__(
         self,
         email: str,
