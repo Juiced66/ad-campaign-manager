@@ -3,12 +3,12 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
     paths:
       - 'backend/**'
       - '.github/workflows/ci.yml'
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
     paths:
       - 'backend/**'
       - '.github/workflows/python-ci.yml'
