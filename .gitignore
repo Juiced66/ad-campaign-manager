@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg-info/
+*.egg
+*.log
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+!.env.example
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python tools
+.mypy_cache/
+.pytest_cache/
+.cache/
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+.coverage
+nosetests.xml
+test-results/
+
+# Build artifacts
+build/
+dist/
+*.spec
+
+# Docker
+*.pid
+*.db
+
+# SQLite and logs
+*.sqlite3
+*.db
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# --- Vue 3 Frontend ---
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.cache/
+frontend/.vitepress/cache/
+frontend/.output/
+
+
