@@ -105,7 +105,7 @@ Docker is the primary method for launching and deploying the project. This ensur
 
 - **Backend:** Run tests using:
   ```bash
-  docker-compose exec backend pytest
+  docker-compose exec fastapi pytest
   ```
   You can also run tests locally if not using Docker, but you'll need to create a virtual environment and install dependencies as shown above.
 - **Frontend:** Execute tests with:
