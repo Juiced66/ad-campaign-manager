@@ -14,3 +14,7 @@ export async function logout() {
     return { success: true };
   }
 }
+
+// async function refresh() {
+//   // TODO
+// }

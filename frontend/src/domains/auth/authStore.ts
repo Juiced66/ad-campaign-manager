@@ -27,6 +27,10 @@ export const useAuthStore = defineStore(
       setUser(undefined);
     }
 
+    // async function refresh() {
+    //   // TODO
+    // }
+    
     return {
       token,
       setToken,
