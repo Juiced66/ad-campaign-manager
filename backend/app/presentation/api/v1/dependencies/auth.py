@@ -15,7 +15,7 @@ from app.presentation.api.v1.dependencies.repositories import (
 
 logger = logging.getLogger(__name__)
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,13 +48,6 @@ def get_current_user(
     except Exception as e:
         logger.error(f"Unexpected error during token decode: {e}", exc_info=True)
         raise credentials_exception
-
-    if hasattr(token_repo, "token_exists") and token_repo.token_exists(token):
-        raise revoked_token_exception
-    elif not hasattr(token_repo, "token_exists"):
-        logger.warning(
-            "TokenRepository may be missing 'token_exists' method for revocation check."
-        )
 
     user = user_repo.get_by_email(email=email)
     if user is None:

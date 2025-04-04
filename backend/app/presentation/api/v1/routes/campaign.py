@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.application.schemas.campaign import Campaign, CampaignCreate, CampaignUpdate
 from app.application.use_cases.campaign import services as campaign_services
+from app.application.schemas.paginated_response import PaginatedResponse
 from app.domain.entities.user import User as DomainUser
 from app.domain.interfaces.campaign_repository import ICampaignRepository
 from app.presentation.api.v1.dependencies.auth import get_current_user
@@ -13,7 +14,7 @@ from app.presentation.api.v1.dependencies.repositories import get_campaign_repos
 router = APIRouter()
 
 
-@router.get("/", response_model=List[Campaign])
+@router.get("/", response_model=PaginatedResponse[Campaign])
 def list_campaigns(
     skip: int = 0,
     limit: int = 100,

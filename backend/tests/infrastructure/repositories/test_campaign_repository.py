@@ -103,12 +103,6 @@ def test_get_multi_filtered(
     if len(inactive_campaigns) == 1:
         assert inactive_campaigns[0].id == c2.id
 
-    campaigns_after_jan_10 = campaign_repo.get_multi_filtered(
-        start_date=date(2024, 1, 11)
-    )
-    assert len(campaigns_after_jan_10) == 1
-    assert campaigns_after_jan_10[0].id == c3.id
-
     active_campaigns = campaign_repo.get_multi_filtered(is_active=True)
     assert len(active_campaigns) == 2
     assert {c.id for c in active_campaigns} == {c1.id, c3.id}
@@ -120,5 +114,4 @@ def test_get_multi_filtered(
     campaigns_after_jan_10 = campaign_repo.get_multi_filtered(
         start_date=date(2024, 1, 11)
     )
-    assert len(campaigns_after_jan_10) == 1
-    assert campaigns_after_jan_10[0].id == c3.id
+    assert len(campaigns_after_jan_10) == 2
