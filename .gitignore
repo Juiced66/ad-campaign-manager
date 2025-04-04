@@ -60,6 +60,7 @@ frontend/.env
 frontend/.cache/
 frontend/.vitepress/cache/
 frontend/.output/
+frontend/.vite
 # Logs
 logs
 *.log

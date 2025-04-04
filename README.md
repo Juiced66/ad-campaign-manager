@@ -52,7 +52,7 @@ Docker is the primary method for launching and deploying the project. This ensur
 2. **Access the Application:**
 
    - The FastAPI backend will be available (e.g., at [http://localhost:8000](http://localhost:8000)).
-   - The Vue.js frontend will be accessible at the URL provided by Docker Compose.
+   - The Vue.js frontend will be accessible (e.g., at [http://localhost:5173](http://localhost:5173)).
    - API documentation is available via Swagger/Redoc at [http://localhost:8000/docs](http://localhost:8000/docs). or [http://localhost:8000/redoc](http://localhost:8000/redoc) 
 
 3. **Container Management:**
@@ -65,10 +65,10 @@ Docker is the primary method for launching and deploying the project. This ensur
 ## Technologies
 
 - **Backend:** Python, FastAPI, SQLAlchemy, Pydantic
-- **Frontend:** Vue.js (Vue 3 with Composition API), Vue Router, and a CSS framework (Bootstrap or Tailwind CSS) (TBD)
+- **Frontend:** Vue.js (Vue 3 with Composition API), Vue Router, and a CSS framework (Tailwind CSS)
 - **Database:** SQLite (development) with an option to switch to MySQL in production
 - **Authentication:** JWT for secure API access
-- **Testing:** Pytest for backend tests and Jest/Vue Test Utils for frontend tests
+- **Testing:** Pytest for backend tests and Vitest for frontend tests
 - **Containerization:** Docker and Docker Compose
 
 ## Setup & Installation
@@ -88,7 +88,7 @@ Docker is the primary method for launching and deploying the project. This ensur
      ```
    - Access the API docs at [http://localhost:8000/docs](http://localhost:8000/docs).
 
-### Frontend Setup (TBD)
+### Frontend Setup
 
 1. **Without Docker (optional):**
    - Navigate to the `frontend` directory.

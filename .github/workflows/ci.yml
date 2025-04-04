@@ -1,4 +1,3 @@
-
 name: CI
 
 on:
@@ -6,52 +5,50 @@ on:
     branches: [ "master" ]
     paths:
       - 'backend/**'
+      - 'frontend/**'
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [ "master" ]
     paths:
       - 'backend/**'
-      - '.github/workflows/python-ci.yml'
+      - 'frontend/**'
+      - '.github/workflows/ci.yml'
 
 jobs:
-  build_and_test:
+  backend_build_and_test: # Renamed job for clarity
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./backend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Cache dependencies
+      - name: Cache Pip dependencies
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip 
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      - name: Install backend dependencies
+        working-directory: ./backend
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Lint application code with Pylint
+      - name: Lint backend application code with Pylint
+        working-directory: ./backend
         run: |
           # Only lint the main application code, exclude tests directory
           pylint app
 
-      - name: Test with Pytest
+      - name: Test backend with Pytest
+        working-directory: ./backend
         run: |
-          # Pytest should automatically find pytest.ini and the tests directory
           pytest
         env:
           DATABASE_URL: "sqlite:///:memory:"
@@ -61,3 +58,34 @@ jobs:
           FIRST_SUPERUSER_EMAIL: "ci-admin@test.com"
           FIRST_SUPERUSER_PASSWORD: "ci-superpassword"
           BACKEND_CORS_ORIGINS: '["*"]'
+
+  frontend_build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Node modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lint frontend code
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Test frontend code
+        working-directory: ./frontend
+        run: npm run test
