@@ -71,6 +71,14 @@ Docker is the primary method for launching and deploying the project. This ensur
 - **Testing:** Pytest for backend tests and Vitest for frontend tests
 - **Containerization:** Docker and Docker Compose
 
+## ✨ Features
+
+- Create / edit / delete ad campaigns
+- Toggle campaign activation
+- JWT-based auth with protected routes
+- Responsive UI with Vue 3 + Tailwind
+- Swagger/Redoc API documentation
+
 ## Setup & Installation
 
 ### Backend Setup
@@ -116,11 +124,11 @@ Docker is the primary method for launching and deploying the project. This ensur
 ## Future Improvements
 
 - Enhanced logging and error handling.
-- Advanced UI/UX features.
-- Further automation through CI/CD pipelines.
+- Refresh Tokens
 
 ## Conclusion
 
 This project demonstrates modern full-stack development techniques tailored for an Ad Tech environment. By leveraging Domain-Driven Design, Hexagonal Architecture, and the Repository Pattern, we ensure a clean, scalable, and maintainable codebase that not only meets current requirements but is also primed for future enhancements.
 
+![Build](https://img.shields.io/github/actions/workflow/status/Juiced66/ad-campaign-manager/ci.yml)
 
