@@ -10,3 +10,19 @@ services:
     ports:
       - "8000:8000"
     command: uvicorn app.presentation.api.v1.main:app --host 0.0.0.0 --port 8000 --reload
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: vue-ad-campaign-manager-app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      # Ensures Vite's HMR and file watching works reliably within Docker, especially on Windows/macOS
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    depends_on:
+      - fastapi

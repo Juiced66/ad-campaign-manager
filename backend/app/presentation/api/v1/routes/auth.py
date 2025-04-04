@@ -79,7 +79,7 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
 
     return {"access_token": access_token, "token_type": "bearer"}
 
-
+# TODO: currently unusable because depends on get_current_user
 @router.post("/refresh", response_model=Token)
 def refresh_token(
     request: TokenRequest,
