@@ -1,5 +1,5 @@
 from datetime import date
-from typing import List, Optional
+from typing import Optional, Dict, Any
 
 from app.application.schemas.campaign import Campaign as CampaignSchema
 from app.application.schemas.campaign import CampaignCreate, CampaignUpdate
@@ -16,8 +16,8 @@ def get_campaigns(
     is_active: Optional[bool] = None,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
-) -> List[Campaign]:
-    return repo.get_multi_filtered(
+) -> Dict[str, Any]:
+    items = repo.get_multi_filtered(
         skip=skip,
         limit=limit,
         is_active=is_active,
@@ -25,6 +25,16 @@ def get_campaigns(
         end_date=end_date,
     )
 
+    total = repo.count_filtered(
+        is_active=is_active,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    return {
+        "items": items,
+        "total": total,
+    }
 
 def create_campaign(repo: ICampaignRepository, dto: CampaignCreate) -> Campaign:
     entity = Campaign(**dto.model_dump())

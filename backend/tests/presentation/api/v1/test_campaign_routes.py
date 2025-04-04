@@ -49,7 +49,7 @@ def test_read_campaigns_authenticated(
     response = client.get("/api/v1/campaigns/", headers=test_auth_headers)
     assert response.status_code == 200
     data = response.json()
-    assert isinstance(data, list)
+    assert isinstance(data, dict)
 
 
 def test_read_specific_campaign(

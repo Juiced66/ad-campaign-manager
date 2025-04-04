@@ -19,6 +19,36 @@ class CampaignSqlAlchemyRepository(
     def __init__(self, db: Session):
         super().__init__(db, CampaignModel, Campaign)
 
+    def _build_filtered_query(
+        self,
+        *,
+        is_active: Optional[bool] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+    ):
+        filters = []
+
+        if is_active is not None:
+            filters.append(self.model.is_active == is_active)
+
+        if start_date and end_date:
+            filters.append(
+                and_(
+                    self.model.start_date <= end_date,
+                    self.model.end_date >= start_date,
+                )
+            )
+        elif start_date:
+            filters.append(self.model.end_date >= start_date)
+        elif end_date:
+            filters.append(self.model.start_date <= end_date)
+
+        query = self.db.query(self.model)
+        if filters:
+            query = query.filter(and_(*filters))
+
+        return query
+
     def get_multi_filtered(
         self,
         *,
@@ -28,20 +58,26 @@ class CampaignSqlAlchemyRepository(
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
     ) -> List[Campaign]:
-        filters = []
-        if is_active is not None:
-            filters.append(self.model.is_active == is_active)
-        if start_date is not None:
-            filters.append(self.model.start_date >= start_date)
-        if end_date is not None:
-            filters.append(self.model.end_date <= end_date)
-
-        query = self.db.query(self.model)
-        if filters:
-            query = query.filter(and_(*filters))
+        query = self._build_filtered_query(
+            is_active=is_active, start_date=start_date, end_date=end_date
+        )
 
         results = query.offset(skip).limit(limit).all()
         return [self._to_entity(obj) for obj in results if obj is not None]
+
+    def count_filtered(
+        self,
+        *,
+        is_active: Optional[bool] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+    ) -> int:
+        query = self._build_filtered_query(
+            is_active=is_active, start_date=start_date, end_date=end_date
+        )
+
+        return query.count()
+
 
     def _create_entity_instance(self, db_obj: CampaignModel) -> Campaign:
         return Campaign(

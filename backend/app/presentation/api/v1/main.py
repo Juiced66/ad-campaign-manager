@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import FastAPI
-
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.presentation.api.v1.lifespan import lifespan
 from app.presentation.api.v1.routes import auth, campaign, user
@@ -17,6 +17,14 @@ app.include_router(
     campaign.router, prefix=f"{api_prefix}/campaigns", tags=["Campaigns"]
 )
 app.include_router(auth.router, prefix=f"{api_prefix}/auth", tags=["Authentication"])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 logger.info("Fast Api router initialized")
 

@@ -2,6 +2,7 @@ import logging
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
@@ -9,6 +10,7 @@ from app.application.schemas.token import Token
 from app.application.use_cases.user import services as user_service
 from app.core.config import settings
 from app.core.security import TokenError, create_access_token, verify_password
+from app.domain.interfaces.token_repository import ITokenRepository
 from app.domain.entities.user import User as DomainUser
 from app.infrastructure.database.sql_alchemy.session import get_db
 from app.presentation.api.v1.dependencies.auth import get_current_user
@@ -17,6 +19,8 @@ from app.presentation.api.v1.dependencies.repositories import (
     get_user_repository,
 )
 
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Authentication"])
@@ -114,20 +118,9 @@ def refresh_token(
     return {"access_token": new_token, "token_type": "bearer"}
 
 @router.post("/logout")
-def logout(
-    request: TokenRequest,
-    _: DomainUser = Depends(get_current_user),
-    db: Session = Depends(get_db),
+async def logout(
+    token: str = Depends(oauth2_scheme),
+    token_repo: ITokenRepository = Depends(get_token_repository),
 ):
-    token_repo = get_token_repository(db)
-
-    if hasattr(token_repo, "revoke_token"):
-        token_repo.revoke_token(request.token)
-        return {"detail": "Successfully logged out"}
-    else:
-        logger.error(
-            "Logout failed: TokenRepository does not have a revoke_token method."
-        )
-        raise HTTPException(
-            status_code=501, detail="Logout functionality not fully implemented."
-        )
+    token_repo.revoke_token(token)
+    return {"message": "Logged out"}
