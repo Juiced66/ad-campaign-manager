@@ -1,4 +1,5 @@
 export interface Token {
   access_token: string;
-  type: 'bearer';
+  refresh_token: string;
+  token_type: 'bearer';
 }

@@ -40,21 +40,36 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, _, next) => {
-  if (to.path === '/logout') {
-    const authStore = useAuthStore();
-    await authStore.logout();
 
+router.beforeEach(async (to, _, next) => {
+  const authStore = useAuthStore(); // Get stores
+  const userStore = useUserStore();
+
+  if (to.path === '/logout') {
+    await authStore.logout(); 
     next({ name: 'Login' });
     return;
   }
+
   if (to.meta.requiresAuth) {
-    const userStore = useUserStore();
-    try {
-      await userStore.fetchMe();
+    if (!userStore.isAuthenticated || !authStore.token) {
+       try {
+         console.log('Route requires auth, fetching user...');
+         await userStore.fetchMe();
+         console.log('User fetch successful, proceeding.');
+         next();
+       } catch (error: any) {
+          console.log('User fetch failed in guard, redirecting to login.', error?.response?.status);
+           if (error?.response?.status === 401 || !authStore.refreshToken) {
+               await authStore.logout();
+               next({ name: 'Login' });
+           } else {
+               console.error("Unexpected error in router guard fetchMe:", error);
+               next(false);
+           }
+       }
+    } else {
       next();
-    } catch {
-      next({ name: 'Login' });
     }
   } else {
     next();

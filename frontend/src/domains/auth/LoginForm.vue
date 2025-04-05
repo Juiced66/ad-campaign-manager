@@ -41,7 +41,7 @@ import BaseInput from '@/shared/components/BaseInput.vue';
 import BaseButton from '@/shared/components/BaseButton.vue';
 
 // Stores
-const { login } = useAuthStore();
+const authStore = useAuthStore();
 
 // Refs
 const errors = ref<{ email?: string; password?: string }>({});
@@ -66,11 +66,15 @@ async function submit() {
 
   loading.value = true;
   try {
-    await login(form.value.email, form.value.password);
+    await authStore.login(form.value.email, form.value.password);
     router.push('/campaigns');
-  } catch (err) {
-    console.error(err);
-    errorMessage.value = 'Invalid credentials';
+  } catch (err: any) {
+    console.error("Login failed:", err);
+    if (err.response && err.response.status === 401) {
+         errorMessage.value = 'Invalid credentials';
+    } else {
+        errorMessage.value = 'Login failed. Please try again.';
+    }
   } finally {
     loading.value = false;
   }

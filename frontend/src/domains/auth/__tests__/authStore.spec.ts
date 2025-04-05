@@ -1,76 +1,137 @@
-import { createPinia, setActivePinia } from 'pinia';
-import { useAuthStore } from '../authStore'; // Import the store
-import * as authService from '../authService'; // Import service to mock its functions
+import { mount } from '@vue/test-utils';
+import { createTestingPinia } from '@pinia/testing';
 import { vi } from 'vitest';
-import type { Token } from '../authTypes';
+import LoginForm from '../LoginForm.vue';
+import BaseInput from '@/shared/components/BaseInput.vue';
+import BaseButton from '@/shared/components/BaseButton.vue';
+import { useAuthStore } from '../authStore';
+import { nextTick } from 'vue';
 
-// --- Mocking Setup ---
-
-// Mock the entire authService module
-vi.mock('../authService', () => ({
-  login: vi.fn(),
-  logout: vi.fn(),
-  me: vi.fn(), // Mock other functions if the store ever uses them
+const mockRouterPush = vi.fn();
+vi.mock('vue-router', () => ({
+  useRouter: () => ({
+    push: mockRouterPush,
+  }),
 }));
 
-// Type assertion for easier mocking
-const mockedAuthService = authService as vi.Mocked<typeof authService>;
+describe('LoginForm.vue', () => {
+  let pinia: any;
+  let authStore: ReturnType<typeof useAuthStore>;
 
-// --- Test Suite ---
-
-describe('authStore.ts', () => {
-  // Setup Pinia before each test
   beforeEach(() => {
-    setActivePinia(createPinia());
-    // Reset mocks before each test
     vi.clearAllMocks();
+    pinia = createTestingPinia({
+      stubActions: true,
+      createSpy: vi.fn,
+    });
+    authStore = useAuthStore();
   });
 
-  it('initial state has undefined token', () => {
-    const store = useAuthStore();
-    expect(store.token).toBeUndefined();
+  it('renders email, password inputs, and login button', () => {
+    const wrapper = mount(LoginForm, {
+      global: { plugins: [pinia] },
+    });
+
+    expect(wrapper.find('input#email[type="email"]').exists()).toBe(true);
+    expect(wrapper.find('input#password[type="password"]').exists()).toBe(true);
+    expect(wrapper.findComponent(BaseButton).text()).toBe('Log In');
+    expect(wrapper.find('h2').text()).toBe('Login');
   });
 
-  it('setToken updates the token state', () => {
-    const store = useAuthStore();
-    const newToken = 'mock-jwt-token-string'; // Cast for simplicity in test
+  it('updates form data using v-model', async () => {
+    const wrapper = mount(LoginForm, { global: { plugins: [pinia] } });
 
-    store.setToken(newToken);
+    const emailInput = wrapper.find('input#email');
+    const passwordInput = wrapper.find('input#password');
 
-    expect(store.token).toBe(newToken);
+    await emailInput.setValue('test@example.com');
+    await passwordInput.setValue('password123');
+
+    expect((wrapper.vm as any).form.email).toBe('test@example.com');
+    expect((wrapper.vm as any).form.password).toBe('password123');
   });
 
-  it('login action calls authService.login', async () => {
-    const store = useAuthStore();
-    const email = 'test@user.com';
-    const password = 'password';
-    const fakeToken = 'returned-token';
+  it('shows validation errors for empty fields on submit', async () => {
+    const wrapper = mount(LoginForm, { global: { plugins: [pinia] } });
 
-    // Mock the service call *before* calling the action
-    mockedAuthService.login.mockResolvedValue(fakeToken);
+    await wrapper.find('form').trigger('submit.prevent');
 
-    await store.login(email, password);
+    expect(authStore.login).not.toHaveBeenCalled();
+    expect(mockRouterPush).not.toHaveBeenCalled();
 
-    expect(mockedAuthService.login).toHaveBeenCalledTimes(1);
-    expect(mockedAuthService.login).toHaveBeenCalledWith(email, password);
+    const errors = (wrapper.vm as any).errors;
+    expect(errors.email).toBe('Email required');
+    expect(errors.password).toBe('Password required');
+
+    const emailInputWrapper = wrapper.findComponent(BaseInput);
+    const passwordInputWrapper = wrapper.findAllComponents(BaseInput)[1];
+    expect(emailInputWrapper.props('error')).toBe('Email required');
+    expect(passwordInputWrapper.props('error')).toBe('Password required');
   });
 
-  it('logout action calls authService.logout', async () => {
-    const store = useAuthStore();
-    const initialToken = 'existing-token';
-    store.setToken(initialToken); // Set an initial token
+  it('calls authStore.login action and navigates on successful submit', async () => {
+    authStore.login = vi.fn().mockResolvedValue(undefined);
 
-    // Mock the service call
-    mockedAuthService.logout.mockResolvedValue({ success: true });
+    const wrapper = mount(LoginForm, { global: { plugins: [pinia] } });
 
-    await store.logout();
+    const testEmail = 'good@user.com';
+    const testPassword = 'correctpassword';
 
-    expect(mockedAuthService.logout).toHaveBeenCalledTimes(1);
+    await wrapper.find('input#email').setValue(testEmail);
+    await wrapper.find('input#password').setValue(testPassword);
+
+    await wrapper.find('form').trigger('submit.prevent');
+
+    await vi.dynamicImportSettled();
+    await nextTick();
+
+    expect(authStore.login).toHaveBeenCalledTimes(1);
+    expect(authStore.login).toHaveBeenCalledWith(testEmail, testPassword);
+
+    expect(mockRouterPush).toHaveBeenCalledTimes(1);
+    expect(mockRouterPush).toHaveBeenCalledWith('/campaigns');
+    expect(wrapper.find('p.text-red-600').exists()).toBe(false);
   });
 
-  it('persist configuration exists', () => {
-    const storeDefinition = useAuthStore();
+  it('shows error message and does not navigate on failed login action', async () => {
+    const loginError = new Error('Invalid credentials from store');
+     (loginError as any).response = { status: 401 };
+    authStore.login = vi.fn().mockRejectedValue(loginError);
 
-    expect(storeDefinition.$id).toBe('auth'); // Verify store ID as an indirect check
+    const wrapper = mount(LoginForm, { global: { plugins: [pinia] } });
+
+    const testEmail = 'bad@user.com';
+    const testPassword = 'wrongpassword';
+
+    await wrapper.find('input#email').setValue(testEmail);
+    await wrapper.find('input#password').setValue(testPassword);
+
+    await wrapper.find('form').trigger('submit.prevent');
+    await vi.dynamicImportSettled();
+    await nextTick();
+
+    expect(authStore.login).toHaveBeenCalledTimes(1);
+    expect(authStore.login).toHaveBeenCalledWith(testEmail, testPassword);
+
+    expect(mockRouterPush).not.toHaveBeenCalled();
+
+    const errorMessage = wrapper.find('p.text-red-600');
+    expect(errorMessage.exists()).toBe(true);
+    expect(errorMessage.text()).toBe('Invalid credentials');
+  });
+
+  it('displays loading state on button during submission', async () => {
+    authStore.login = vi.fn().mockImplementation(() => new Promise(() => {}));
+
+    const wrapper = mount(LoginForm, { global: { plugins: [pinia] } });
+
+    await wrapper.find('input#email').setValue('test@example.com');
+    await wrapper.find('input#password').setValue('password');
+
+    wrapper.find('form').trigger('submit.prevent');
+    await nextTick();
+
+    const button = wrapper.findComponent(BaseButton);
+    expect(button.props('loading')).toBe(true);
   });
 });
