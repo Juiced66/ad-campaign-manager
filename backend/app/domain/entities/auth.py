@@ -1,5 +1,4 @@
-# ./backend/app/domain/entities/auth.py
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 
 class AccessTokenData:

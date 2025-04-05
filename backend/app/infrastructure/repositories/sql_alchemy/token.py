@@ -20,11 +20,24 @@ class SQLAlchemyTokenRepository(ITokenRepository):
     def _to_entity(self, db_obj: Optional[RefreshTokenModel]) -> Optional[RefreshToken]:
         if db_obj is None:
             return None
-        created_at = db_obj.created_at.replace(tzinfo=timezone.utc) if db_obj.created_at.tzinfo is None else db_obj.created_at
-        expires_at = db_obj.expires_at.replace(tzinfo=timezone.utc) if db_obj.expires_at.tzinfo is None else db_obj.expires_at
+
+        created_at = (
+            db_obj.created_at.replace(tzinfo=timezone.utc)
+            if db_obj.created_at and db_obj.created_at.tzinfo is None
+            else db_obj.created_at
+        )
+        expires_at = (
+            db_obj.expires_at.replace(tzinfo=timezone.utc)
+            if db_obj.expires_at and db_obj.expires_at.tzinfo is None
+            else db_obj.expires_at
+        )
         revoked_at = None
         if db_obj.revoked_at:
-            revoked_at = db_obj.revoked_at.replace(tzinfo=timezone.utc) if db_obj.revoked_at.tzinfo is None else db_obj.revoked_at
+            revoked_at = (
+                db_obj.revoked_at.replace(tzinfo=timezone.utc)
+                if db_obj.revoked_at.tzinfo is None
+                else db_obj.revoked_at
+            )
 
         return self.entity_cls(
             id=db_obj.id,
@@ -36,11 +49,19 @@ class SQLAlchemyTokenRepository(ITokenRepository):
         )
 
     def _from_entity(self, entity: RefreshToken) -> RefreshTokenModel:
-        created_at_naive = entity.created_at.astimezone(timezone.utc).replace(tzinfo=None)
-        expires_at_naive = entity.expires_at.astimezone(timezone.utc).replace(tzinfo=None)
+        created_at_naive = (
+            entity.created_at.astimezone(timezone.utc).replace(tzinfo=None)
+            if entity.created_at else None
+        )
+        expires_at_naive = (
+            entity.expires_at.astimezone(timezone.utc).replace(tzinfo=None)
+            if entity.expires_at else None
+        )
         revoked_at_naive = None
         if entity.revoked_at:
-            revoked_at_naive = entity.revoked_at.astimezone(timezone.utc).replace(tzinfo=None)
+            revoked_at_naive = (
+                entity.revoked_at.astimezone(timezone.utc).replace(tzinfo=None)
+            )
 
         return self.model(
             id=entity.id,
@@ -60,17 +81,26 @@ class SQLAlchemyTokenRepository(ITokenRepository):
         return self._to_entity(db_obj)
 
     def get_by_token_value(self, token_value: str) -> Optional[RefreshToken]:
-        db_obj = self.db.query(self.model).filter(self.model.token_value == token_value).first()
+        db_obj = self.db.query(self.model)\
+                       .filter(self.model.token_value == token_value)\
+                       .first()
         return self._to_entity(db_obj)
-
 
     def update(self, entity: RefreshToken) -> RefreshToken:
         if entity.id is None:
             raise ValueError("Cannot update entity without an ID")
 
+        revoked_at_naive = (
+            entity.revoked_at.astimezone(timezone.utc).replace(tzinfo=None)
+            if entity.revoked_at else None
+        )
+        expires_at_naive = (
+             entity.expires_at.astimezone(timezone.utc).replace(tzinfo=None)
+             if entity.expires_at else None
+        )
         update_data = {
-            "revoked_at": entity.revoked_at.astimezone(timezone.utc).replace(tzinfo=None) if entity.revoked_at else None,
-            "expires_at": entity.expires_at.astimezone(timezone.utc).replace(tzinfo=None),
+            "revoked_at": revoked_at_naive,
+            "expires_at": expires_at_naive,
         }
 
         stmt = (
@@ -79,39 +109,35 @@ class SQLAlchemyTokenRepository(ITokenRepository):
             .values(**update_data)
         )
         self.db.execute(stmt)
-
         self.db.commit()
 
         updated_db_obj = self.db.get(self.model, entity.id)
 
-
         if updated_db_obj is None:
-             raise ValueError(f"Refresh token with ID {entity.id} not found after update attempt.")
+            raise ValueError(
+                f"Refresh token with ID {entity.id} not found after update."
+            )
 
         return self._to_entity(updated_db_obj)
-    
+
     def remove_expired_or_revoked(self) -> int:
         """
         Removes refresh tokens that are either expired or have been revoked.
         Returns the number of tokens deleted.
-        TODO: schedules cleaning ? But don't know how in that stack for now
         """
-        now_utc_naive = datetime.now(timezone.utc)
+        now_utc_naive = datetime.now(timezone.utc).replace(tzinfo=None)
 
         delete_condition = or_(
-            self.model.revoked_at != None,
+            self.model.revoked_at is not None,
             self.model.expires_at <= now_utc_naive
         )
 
-        # Build the delete statement
         stmt = sqlalchemy_delete(self.model).where(delete_condition)
-
 
         result = self.db.execute(stmt)
         self.db.commit()
 
-        # Return the number of rows affected
         count = result.rowcount
         if count > 0:
-             logger.info(f"Removed {count} expired/revoked refresh tokens.")
+            logger.info("Removed %d expired/revoked refresh tokens.", count)
         return count

@@ -2,8 +2,8 @@ import { useAuthStore } from '@/domains/auth/authStore';
 import axios, { type InternalAxiosRequestConfig } from 'axios'; // Import specific types
 
 let isRefreshing = false;
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 let failedQueue: { resolve: (value: any) => void; reject: (reason?: any) => void }[] = [];
-
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach(prom => {
     if (error) {

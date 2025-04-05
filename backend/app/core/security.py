@@ -83,4 +83,4 @@ def decode_access_token(token: str) -> dict:
 
 def create_refresh_token_string() -> str:
     """Generates a cryptographically secure random string for refresh tokens."""
-    return secrets.token_urlsafe(32) 
+    return secrets.token_urlsafe(32)

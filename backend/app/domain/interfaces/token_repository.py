@@ -11,19 +11,15 @@ class ITokenRepository(ABC):
     @abstractmethod
     def add(self, entity: RefreshToken) -> RefreshToken:
         """Persists a new refresh token entity."""
-        pass
 
     @abstractmethod
     def get_by_token_value(self, token_value: str) -> Optional[RefreshToken]:
-         """Retrieves a refresh token entity by its value."""
-         pass
+        """Retrieves a refresh token entity by its value."""
 
     @abstractmethod
     def update(self, entity: RefreshToken) -> RefreshToken:
         """Updates an existing refresh token entity (e.g., setting revoked_at)."""
-        pass
 
     @abstractmethod
     def remove_expired_or_revoked(self) -> int:
-       """Removes old tokens and returns the count removed."""
-       pass
+        """Removes old tokens and returns the count removed."""

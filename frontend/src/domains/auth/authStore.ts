@@ -64,7 +64,7 @@ export const useAuthStore = defineStore(
         const { access_token: newAccessToken, refresh_token: newRefreshTokenValue } = await apiRefreshToken(refreshToken.value);
         setTokens(newAccessToken, newRefreshTokenValue);
         return newAccessToken;
-      } catch (error: any) {
+      } catch (error) {
         console.error('Token refresh failed:', error);
         await logout();
         return null;
