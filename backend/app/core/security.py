@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
+import secrets
 
 import bcrypt
 from jose import JWTError, jwt
@@ -79,3 +80,7 @@ def decode_access_token(token: str) -> dict:
     except JWTError as e:
         logger.error("Token decode error: %s", e, exc_info=True)
         raise TokenError("Invalid token") from e
+
+def create_refresh_token_string() -> str:
+    """Generates a cryptographically secure random string for refresh tokens."""
+    return secrets.token_urlsafe(32) 

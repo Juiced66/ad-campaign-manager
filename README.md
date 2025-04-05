@@ -51,8 +51,8 @@ Docker is the primary method for launching and deploying the project. This ensur
 
 2. **Access the Application:**
 
-   - The FastAPI backend will be available (e.g., at [http://localhost:8000](http://localhost:8000)).
-   - The Vue.js frontend will be accessible (e.g., at [http://localhost:5173](http://localhost:5173)).
+   - The FastAPI backend will be available at [http://localhost:8000](http://localhost:8000).
+   - The Vue.js frontend will be accessible at [http://localhost:5173](http://localhost:5173).
    - API documentation is available via Swagger/Redoc at [http://localhost:8000/docs](http://localhost:8000/docs). or [http://localhost:8000/redoc](http://localhost:8000/redoc) 
 
 3. **Container Management:**
@@ -67,13 +67,13 @@ Docker is the primary method for launching and deploying the project. This ensur
 - **Backend:** Python, FastAPI, SQLAlchemy, Pydantic
 - **Frontend:** Vue.js (Vue 3 with Composition API), Vue Router, and a CSS framework (Tailwind CSS)
 - **Database:** SQLite (development) with an option to switch to MySQL in production
-- **Authentication:** JWT for secure API access
+- **Authentication:** JWT for secure API access (with refresh tokens and no access_token stored)
 - **Testing:** Pytest for backend tests and Vitest for frontend tests
 - **Containerization:** Docker and Docker Compose
 
 ## ✨ Features
 
-- Create / edit / delete ad campaigns
+- Create / edit / duplicate / delete ad campaigns
 - Toggle campaign activation
 - JWT-based auth with protected routes
 - Responsive UI with Vue 3 + Tailwind
@@ -124,7 +124,6 @@ Docker is the primary method for launching and deploying the project. This ensur
 ## Future Improvements
 
 - Enhanced logging and error handling.
-- Refresh Tokens
 
 ## Conclusion
 

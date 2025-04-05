@@ -7,6 +7,7 @@ from app.infrastructure.database.sql_alchemy.init_db import init_db
 from app.infrastructure.database.sql_alchemy.models.base import Base
 from app.infrastructure.database.sql_alchemy.models.campaign import Campaign  # noqa: F401
 from app.infrastructure.database.sql_alchemy.models.user import User  # noqa: F401
+from app.infrastructure.database.sql_alchemy.models.token import RefreshTokenModel   # noqa: F401
 from app.infrastructure.database.sql_alchemy.session import SessionLocal, engine
 
 logger = logging.getLogger(__name__)

@@ -5,8 +5,11 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy.orm import Session
 
+from app.application.use_cases.auth.services import AuthService
 from app.core.security import TokenError, decode_access_token
 from app.domain.entities.user import User as DomainUser
+from app.domain.interfaces.token_repository import ITokenRepository
+from app.domain.interfaces.user_repository import IUserRepository
 from app.infrastructure.database.sql_alchemy.session import get_db
 from app.presentation.api.v1.dependencies.repositories import (
     get_token_repository,
@@ -53,3 +56,9 @@ def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+def get_auth_service(
+    user_repo: IUserRepository = Depends(get_user_repository),
+    token_repo: ITokenRepository = Depends(get_token_repository)
+) -> AuthService:
+    return AuthService(user_repo=user_repo, token_repo=token_repo)
