@@ -43,12 +43,14 @@
 <script setup lang="ts">
 import BaseButton from './BaseButton.vue';
 // Props
-defineProps<{
+interface Props {
   page: number;
   limit: number;
   total: number;
   disableNext: boolean;
-}>();
+}
+
+defineProps<Props>();
 
 // Emits
 defineEmits<{

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useToast } from 'vue-toastification';
 import { ref } from 'vue';
 
 import {
@@ -12,8 +13,9 @@ export const useAuthStore = defineStore(
   'auth',
   () => {
     const token = ref<string | undefined>();
-    const refreshToken = ref<string | undefined>(); 
-    const isRefreshing = ref(false); 
+    const refreshToken = ref<string | undefined>();
+    const isRefreshing = ref(false);
+    const toast = useToast();
 
     function setTokens(
       newAccessToken: string | undefined,
@@ -32,6 +34,7 @@ export const useAuthStore = defineStore(
       setTokens(access_token, new_refresh_token);
       const userStore = useUserStore();
       await userStore.fetchMe();
+      toast.success('Logged in successfully!');
     }
 
     async function logout() {
@@ -46,7 +49,11 @@ export const useAuthStore = defineStore(
           await apiLogout(currentRefreshToken);
           console.log('Server-side token revoked.');
         } catch (e) {
-          console.warn('Server-side logout/revoke failed, tokens cleared locally.', e);
+          console.warn(
+            'Server-side logout/revoke failed, tokens cleared locally.',
+            e
+          );
+          toast.error('Logout failed on server, logged out locally.');
         }
       }
     }
@@ -57,15 +64,20 @@ export const useAuthStore = defineStore(
         return null;
       }
       if (isRefreshing.value) {
-        return null;      }
+        return null;
+      }
 
       isRefreshing.value = true;
       try {
-        const { access_token: newAccessToken, refresh_token: newRefreshTokenValue } = await apiRefreshToken(refreshToken.value);
+        const {
+          access_token: newAccessToken,
+          refresh_token: newRefreshTokenValue,
+        } = await apiRefreshToken(refreshToken.value);
         setTokens(newAccessToken, newRefreshTokenValue);
         return newAccessToken;
       } catch (error) {
         console.error('Token refresh failed:', error);
+        toast.error('Your session expired. Please log in again.');
         await logout();
         return null;
       } finally {

@@ -69,11 +69,11 @@ async function submit() {
     await authStore.login(form.value.email, form.value.password);
     router.push('/campaigns');
   } catch (err: any) {
-    console.error("Login failed:", err);
+    console.error('Login failed:', err);
     if (err.response && err.response.status === 401) {
-         errorMessage.value = 'Invalid credentials';
+      errorMessage.value = 'Invalid credentials';
     } else {
-        errorMessage.value = 'Login failed. Please try again.';
+      errorMessage.value = 'Login failed. Please try again.';
     }
   } finally {
     loading.value = false;

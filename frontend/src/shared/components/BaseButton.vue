@@ -31,14 +31,16 @@
 import { computed } from 'vue';
 
 // Props
-const props = defineProps<{
+interface Props {
   type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary' | 'danger' | 'link';
   category?: 'default' | 'icon' | 'pill';
   title?: string;
   loading?: boolean;
   disabled?: boolean;
-}>();
+}
+
+const props = defineProps<Props>();
 
 // Computeds
 const buttonClasses = computed(() => {

@@ -31,7 +31,10 @@ describe('authService.ts', () => {
     await authService.login(email, password);
 
     expect(mockedApi.post).toHaveBeenCalledTimes(1);
-    expect(mockedApi.post).toHaveBeenCalledWith('/auth/login', { email, password });
+    expect(mockedApi.post).toHaveBeenCalledWith('/auth/login', {
+      email,
+      password,
+    });
   });
 
   it('login returns Token object on success', async () => {
@@ -55,7 +58,9 @@ describe('authService.ts', () => {
     const error = new Error('Network Error');
     mockedApi.post.mockRejectedValue(error);
 
-    await expect(authService.login(email, password)).rejects.toThrow('Network Error');
+    await expect(authService.login(email, password)).rejects.toThrow(
+      'Network Error'
+    );
     expect(mockedApi.post).toHaveBeenCalledTimes(1);
   });
 
@@ -67,7 +72,9 @@ describe('authService.ts', () => {
     await authService.logout(refreshTokenValue); // Pass the token
 
     expect(mockedApi.post).toHaveBeenCalledTimes(1);
-    expect(mockedApi.post).toHaveBeenCalledWith('/auth/logout', { refresh_token: refreshTokenValue });
+    expect(mockedApi.post).toHaveBeenCalledWith('/auth/logout', {
+      refresh_token: refreshTokenValue,
+    });
   });
 
   it('logout returns { success: true } on API success', async () => {
@@ -85,7 +92,7 @@ describe('authService.ts', () => {
   });
 
   // --- refreshToken ---
-   it('refreshToken calls api.post with correct URL and current refresh token', async () => {
+  it('refreshToken calls api.post with correct URL and current refresh token', async () => {
     const currentRefreshToken = 'current-refresh-token';
     const mockResponse: Token = {
       access_token: 'new-access-token',
@@ -97,12 +104,14 @@ describe('authService.ts', () => {
     await authService.refreshToken(currentRefreshToken);
 
     expect(mockedApi.post).toHaveBeenCalledTimes(1);
-    expect(mockedApi.post).toHaveBeenCalledWith('/auth/refresh', { refresh_token: currentRefreshToken });
+    expect(mockedApi.post).toHaveBeenCalledWith('/auth/refresh', {
+      refresh_token: currentRefreshToken,
+    });
   });
 
   it('refreshToken returns new Token object on success', async () => {
     const currentRefreshToken = 'current-refresh-token';
-     const mockResponse: Token = {
+    const mockResponse: Token = {
       access_token: 'new-access-token',
       refresh_token: 'new-refresh-token',
       token_type: 'bearer',
@@ -113,12 +122,14 @@ describe('authService.ts', () => {
     expect(newTokenData).toEqual(mockResponse);
   });
 
-   it('refreshToken throws error on API failure', async () => {
+  it('refreshToken throws error on API failure', async () => {
     const currentRefreshToken = 'current-refresh-token';
     const error = new Error('Invalid Refresh Token');
     mockedApi.post.mockRejectedValue(error);
 
-    await expect(authService.refreshToken(currentRefreshToken)).rejects.toThrow('Invalid Refresh Token');
+    await expect(authService.refreshToken(currentRefreshToken)).rejects.toThrow(
+      'Invalid Refresh Token'
+    );
     expect(mockedApi.post).toHaveBeenCalledTimes(1);
   });
 });

@@ -40,35 +40,37 @@ const router = createRouter({
   routes,
 });
 
-
 router.beforeEach(async (to, _, next) => {
-  const authStore = useAuthStore(); // Get stores
+  const authStore = useAuthStore();
   const userStore = useUserStore();
 
   if (to.path === '/logout') {
-    await authStore.logout(); 
+    await authStore.logout();
     next({ name: 'Login' });
     return;
   }
 
   if (to.meta.requiresAuth) {
     if (!userStore.isAuthenticated || !authStore.token) {
-       try {
-         console.log('Route requires auth, fetching user...');
-         await userStore.fetchMe();
-         console.log('User fetch successful, proceeding.');
-         next();
-         /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
-       } catch (error: any) {
-          console.log('User fetch failed in guard, redirecting to login.', error?.response?.status);
-           if (error?.response?.status === 401 || !authStore.refreshToken) {
-               await authStore.logout();
-               next({ name: 'Login' });
-           } else {
-               console.error("Unexpected error in router guard fetchMe:", error);
-               next(false);
-           }
-       }
+      try {
+        console.log('Route requires auth, fetching user...');
+        await userStore.fetchMe();
+        console.log('User fetch successful, proceeding.');
+        next();
+        /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
+      } catch (error: any) {
+        console.log(
+          'User fetch failed in guard, redirecting to login.',
+          error?.response?.status
+        );
+        if (error?.response?.status === 401 || !authStore.refreshToken) {
+          await authStore.logout();
+          next({ name: 'Login' });
+        } else {
+          console.error('Unexpected error in router guard fetchMe:', error);
+          next(false);
+        }
+      }
     } else {
       next();
     }

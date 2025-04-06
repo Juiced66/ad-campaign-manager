@@ -20,16 +20,20 @@
 import { computed } from 'vue';
 
 // Props
-const props = defineProps<{
+interface Props {
   id?: string;
   label?: string;
   error?: string;
   modelValue?: string | number | null;
   type?: string;
-}>();
+}
+
+const props = defineProps<Props>();
 
 // Emits
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string | number | null | undefined): void;
+}>();
 
 // Computeds
 const internalValue = computed({

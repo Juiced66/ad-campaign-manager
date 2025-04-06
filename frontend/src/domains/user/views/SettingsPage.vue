@@ -46,7 +46,6 @@ async function save({
       password,
     });
   } catch (e) {
-    
   } finally {
     saving.value = false;
   }

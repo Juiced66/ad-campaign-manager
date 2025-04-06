@@ -49,7 +49,7 @@ export async function updateCampaign(
 }
 
 export async function deleteCampaign(id: number): Promise<void> {
-  void api.delete(`${API}/${id}`);
+  await api.delete(`${API}/${id}`);
 }
 
 export async function toggleCampaign(

@@ -54,10 +54,19 @@ import { formatDate } from '@/shared/utils/formatters';
 import BaseButton from '@/shared/components/BaseButton.vue';
 import BaseSwitch from '@/shared/components/BaseSwitch.vue';
 // Props
-defineProps<{ campaign: Campaign }>();
+interface Props {
+  campaign: Campaign;
+}
+
+defineProps<Props>();
 
 // Emits
-const emit = defineEmits(['edit', 'duplicate', 'delete', 'toggle']);
+const emit = defineEmits<{
+  (e: 'edit', campaign: Campaign): void;
+  (e: 'duplicate', campaign: Campaign): void;
+  (e: 'delete', id: number): void;
+  (e: 'toggle'): void;
+}>();
 
 // Stores
 const campaignStore = useCampaignStore();

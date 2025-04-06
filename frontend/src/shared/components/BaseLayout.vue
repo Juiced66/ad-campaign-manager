@@ -56,7 +56,8 @@
           class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
           @click="sidebarOpen = false"
         >
-           <FontAwesomeIcon :icon="['fas', 'sign-out-alt']" /> <span>Logout</span>
+          <FontAwesomeIcon :icon="['fas', 'sign-out-alt']" />
+          <span>Logout</span>
         </RouterLink>
       </nav>
     </aside>
@@ -104,5 +105,4 @@ const userStore = useUserStore();
 // Refs
 const { isAuthenticated } = storeToRefs(userStore);
 const sidebarOpen = ref(false);
-
 </script>

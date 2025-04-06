@@ -48,11 +48,19 @@ const BASE_FORM_VALUE: Partial<Campaign> = {
   end_date: '',
   budget: 0,
 };
+
 // Props
-const props = defineProps<{ campaign?: Campaign | Partial<Campaign> | null }>();
+interface Props {
+  campaign?: Campaign | Partial<Campaign> | null;
+}
+
+const props = defineProps<Props>();
 
 // Emits
-const emit = defineEmits(['success', 'cancel']);
+const emit = defineEmits<{
+  (e: 'success'): void;
+  (e: 'cancel'): void;
+}>();
 
 // Constants
 const inputFields: FieldConfig[] = [

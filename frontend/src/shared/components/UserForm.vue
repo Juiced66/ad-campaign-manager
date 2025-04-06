@@ -29,7 +29,7 @@ import { reactive, ref, watch } from 'vue';
 import BaseButton from '@/shared/components/BaseButton.vue';
 import BaseInput from '@/shared/components/BaseInput.vue';
 
-// Types
+// Props
 interface Props {
   modelValue?: {
     email?: string;
@@ -39,7 +39,6 @@ interface Props {
   loading?: boolean;
 }
 
-// Props
 const props = defineProps<Props>();
 
 // Emits

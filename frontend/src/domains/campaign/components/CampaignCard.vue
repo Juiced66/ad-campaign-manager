@@ -64,10 +64,19 @@ import BaseSwitch from '@/shared/components/BaseSwitch.vue';
 import BaseButton from '@/shared/components/BaseButton.vue';
 import { useCampaignStore } from '../campaignStore';
 // Props
-defineProps<{ campaign: Campaign }>();
+interface Props {
+  campaign: Campaign;
+}
+
+defineProps<Props>();
 
 // Emits
-const emit = defineEmits(['edit', 'duplicate', 'delete', 'toggle']);
+const emit = defineEmits<{
+  (e: 'edit', campaign: Campaign): void;
+  (e: 'duplicate', campaign: Campaign): void;
+  (e: 'delete', id: number): void;
+  (e: 'toggle'): void;
+}>();
 
 // Stores
 const campaignStore = useCampaignStore();

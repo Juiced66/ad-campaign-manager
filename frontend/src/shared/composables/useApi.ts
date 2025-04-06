@@ -3,9 +3,12 @@ import axios, { type InternalAxiosRequestConfig } from 'axios'; // Import specif
 
 let isRefreshing = false;
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-let failedQueue: { resolve: (value: any) => void; reject: (reason?: any) => void }[] = [];
+let failedQueue: {
+  resolve: (value: any) => void;
+  reject: (reason?: any) => void;
+}[] = [];
 const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
@@ -14,7 +17,6 @@ const processQueue = (error: any, token: string | null = null) => {
   });
   failedQueue = [];
 };
-
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1',
@@ -27,8 +29,8 @@ api.interceptors.request.use(
     const token = authStore.token;
 
     const noAuthUrls = ['/auth/login', '/auth/refresh'];
-    if (token && !noAuthUrls.some(url => config.url?.includes(url))) {
-       config.headers.Authorization = `Bearer ${token}`;
+    if (token && !noAuthUrls.some((url) => config.url?.includes(url))) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -43,23 +45,30 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }; // Type assertion
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    }; // Type assertion
     const authStore = useAuthStore();
 
-    if (error.response?.status === 401 && originalRequest.url !== '/auth/refresh') {
-        if (isRefreshing) {
-            return new Promise((resolve, reject) => {
-                failedQueue.push({ resolve, reject });
-            }).then(newToken => {
-                 if (newToken) {
-                    originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                    return api(originalRequest);
-                 }
-                 return Promise.reject(error);
-            }).catch(err => {
-                return Promise.reject(err);
-            });
-        }
+    if (
+      error.response?.status === 401 &&
+      originalRequest.url !== '/auth/refresh'
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((newToken) => {
+            if (newToken) {
+              originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+              return api(originalRequest);
+            }
+            return Promise.reject(error);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
 
       originalRequest._retry = true;
       isRefreshing = true;
@@ -68,15 +77,20 @@ api.interceptors.response.use(
         const newAccessToken = await authStore.refreshAccessToken();
 
         if (newAccessToken) {
-          console.log('Refresh successful, retrying original request and processing queue.');
-          api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+          console.log(
+            'Refresh successful, retrying original request and processing queue.'
+          );
+          api.defaults.headers.common['Authorization'] =
+            `Bearer ${newAccessToken}`;
           originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
           processQueue(null, newAccessToken);
           return api(originalRequest);
         } else {
-            console.log('Refresh failed (or user logged out during refresh), rejecting original request.');
-            processQueue(error, null);
-             return Promise.reject(error);
+          console.log(
+            'Refresh failed (or user logged out during refresh), rejecting original request.'
+          );
+          processQueue(error, null);
+          return Promise.reject(error);
         }
       } catch (refreshError) {
         console.error('Caught error during refresh process:', refreshError);

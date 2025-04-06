@@ -33,12 +33,17 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 
 // Props
-const props = defineProps<{
+interface Props {
   modelValue: boolean;
-}>();
+}
+
+const props = defineProps<Props>();
 
 // Emits
-const emit = defineEmits(['update:modelValue', 'close']);
+defineEmits<{
+  (e: 'update:modelValue', value: boolean): void; // Although not emitted directly, good practice
+  (e: 'close'): void;
+}>();
 
 // Refs
 const modalRef = ref<HTMLElement | null>(null);

@@ -42,7 +42,9 @@ import BaseInput from '@/shared/components/BaseInput.vue';
 import BaseButton from '@/shared/components/BaseButton.vue';
 import { useCampaignFilters } from '@/domains/campaign/campaignFiltersStore';
 // Emits
-const emit = defineEmits(['reset']);
+defineEmits<{
+  (e: 'reset'): void;
+}>();
 
 // Stores
 const filters = useCampaignFilters();

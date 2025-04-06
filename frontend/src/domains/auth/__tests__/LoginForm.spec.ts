@@ -96,7 +96,7 @@ describe('LoginForm.vue', () => {
 
   it('shows error message and does not navigate on failed login action', async () => {
     const loginError = new Error('Invalid credentials from store');
-     (loginError as any).response = { status: 401 };
+    (loginError as any).response = { status: 401 };
     authStore.login = vi.fn().mockRejectedValue(loginError);
 
     const wrapper = mount(LoginForm, { global: { plugins: [pinia] } });
