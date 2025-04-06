@@ -16,42 +16,43 @@
     <td class="px-6 py-4 text-right">{{ campaign.budget }}€</td>
     <td class="px-6 py-4 text-right">{{ formatDate(campaign.start_date) }}</td>
     <td class="px-6 py-4 text-right">{{ formatDate(campaign.end_date) }}</td>
-    <td class="px-6 py-4 text-right space-x-2 flex flex-nowrap">
-      <BaseSwitch
-        :model-value="campaign.is_active"
-        @update:model-value="() => onToggleStatus(campaign.id)"
-      />
+    <td class="px-6 py-4 ml-auto text-right">
       <BaseButton
         category="icon"
         variant="link"
-        title="edit"
+        title="Edit"
         @click="$emit('edit', campaign)"
-        >✏️</BaseButton
-      >
+        ><FontAwesomeIcon :icon="['fas', 'pencil-alt']"
+      /></BaseButton>
       <BaseButton
         category="icon"
         variant="link"
         title="Duplicate"
         @click="$emit('duplicate', campaign)"
-        >🗐</BaseButton
-      >
+        ><FontAwesomeIcon :icon="['fas', 'copy']"
+      /></BaseButton>
       <BaseButton
         category="icon"
         variant="link"
         title="Delete"
         @click="$emit('delete', campaign.id)"
-        >🗑️</BaseButton
-      >
+        ><FontAwesomeIcon :icon="['fas', 'trash-alt']"
+      /></BaseButton>
+      <BaseSwitch
+        :model-value="campaign.is_active"
+        @update:model-value="() => onToggleStatus(campaign.id)"
+      />
     </td>
   </tr>
 </template>
 
 <script setup lang="ts">
-import { formatDate } from '@/shared/utils/formatters';
 import type { Campaign } from '@/domains/campaign/campaignTypes';
-import BaseSwitch from '@/shared/components/BaseSwitch.vue';
-import BaseButton from '@/shared/components/BaseButton.vue';
 import { useCampaignStore } from '@/domains/campaign/campaignStore';
+import { formatDate } from '@/shared/utils/formatters';
+
+import BaseButton from '@/shared/components/BaseButton.vue';
+import BaseSwitch from '@/shared/components/BaseSwitch.vue';
 // Props
 defineProps<{ campaign: Campaign }>();
 

@@ -42,21 +42,21 @@
           class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
           @click="sidebarOpen = false"
         >
-          📊 <span>Campaigns</span>
+          <FontAwesomeIcon :icon="['fas', 'table']" /> <span>Campaigns</span>
         </RouterLink>
         <RouterLink
           to="/settings"
           class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
           @click="sidebarOpen = false"
         >
-          ⚙️ <span>Settings</span>
+          <FontAwesomeIcon :icon="['fas', 'cog']" /> <span>Settings</span>
         </RouterLink>
         <RouterLink
           to="/logout"
           class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
           @click="sidebarOpen = false"
         >
-          ↪ <span>Logout</span>
+           <FontAwesomeIcon :icon="['fas', 'sign-out-alt']" /> <span>Logout</span>
         </RouterLink>
       </nav>
     </aside>
@@ -93,9 +93,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useUserStore } from '@/domains/user/userStore';
-import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+
+import { useUserStore } from '@/domains/user/userStore';
 
 // Stores
 const userStore = useUserStore();

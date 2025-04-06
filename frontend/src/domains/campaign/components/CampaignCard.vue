@@ -35,24 +35,24 @@
       <BaseButton
         category="icon"
         variant="link"
-        title="edit"
+        title="Edit"
         @click="$emit('edit', campaign)"
-        >✏️</BaseButton
-      >
+        ><FontAwesomeIcon :icon="['fas', 'pencil-alt']"
+      /></BaseButton>
       <BaseButton
         category="icon"
         variant="link"
         title="Duplicate"
         @click="$emit('duplicate', campaign)"
-        >🗐</BaseButton
-      >
+        ><FontAwesomeIcon :icon="['fas', 'copy']"
+      /></BaseButton>
       <BaseButton
         category="icon"
         variant="link"
         title="Delete"
         @click="$emit('delete', campaign.id)"
-        >🗑️</BaseButton
-      >
+        ><FontAwesomeIcon :icon="['fas', 'trash-alt']"
+      /></BaseButton>
     </div>
   </div>
 </template>
