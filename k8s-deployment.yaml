@@ -1,0 +1,156 @@
+# --- Backend Persistent Volume Claim ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fastapi-db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# --- Backend ConfigMap ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fastapi-config
+data:
+  # IMPORTANT: In production, sensitive values like AUTH_SECRET_KEY and
+  # FIRST_SUPERUSER_PASSWORD should be Kubernetes Secrets, not ConfigMaps.
+  # We use a ConfigMap here for Minikube simplicity.
+  AUTH_SECRET_KEY: "minikube-super-secret-key-replace-me-in-prod"
+  FIRST_SUPERUSER_PASSWORD: "minikube-admin-password"
+  # --- Other backend config ---
+  DATABASE_URL: "sqlite:////data/ad_campaigns.db"
+  AUTH_ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  REFRESH_TOKEN_EXPIRE_DAYS: "7"
+  FIRST_SUPERUSER_EMAIL: "admin@minikube.test"
+  # Using '*' is simplest for local dev, but restrict in production.
+  BACKEND_CORS_ORIGINS: '["*"]'
+
+---
+# --- Backend Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-deployment
+spec:
+  replicas: 1 # Start with 1 replica for SQLite compatibility with PVC
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+        - name: fastapi-container
+          image: fastapi-ad-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: fastapi-config
+          volumeMounts:
+            - name: db-storage 
+              mountPath: /data
+          # --- Liveness and Readiness Probes ---
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: fastapi-db-pvc
+
+---
+# --- Backend Service ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+spec:
+  selector:
+    app: fastapi
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+
+---
+# --- Frontend ConfigMap ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+data:
+  VITE_API_BASE_URL: "http://fastapi-service:8000/api/v1"
+
+---
+# --- Frontend Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend-container
+          image: vue-ad-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5173
+          envFrom:
+            - configMapRef:
+                name: frontend-config
+          # --- Liveness and Readiness Probes ---
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5173
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5173
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+
+---
+# --- Frontend Service ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 5173 
+      targetPort: 5173
