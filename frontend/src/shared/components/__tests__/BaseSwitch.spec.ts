@@ -16,7 +16,7 @@ describe('BaseSwitch.vue', () => {
 
     // Check span transform class for 'off' state
     expect(span.classes()).toContain('translate-x-1');
-    expect(span.classes()).not.toContain('translate-x-6');
+    expect(span.classes()).not.toContain('translate-x-5');
   });
 
   it('renders correctly in "on" state (modelValue = true)', () => {
@@ -32,7 +32,7 @@ describe('BaseSwitch.vue', () => {
     expect(button.classes()).not.toContain('bg-gray-300');
 
     // Check span transform class for 'on' state
-    expect(span.classes()).toContain('translate-x-6');
+    expect(span.classes()).toContain('translate-x-5');
     expect(span.classes()).not.toContain('translate-x-1');
   });
 
@@ -75,7 +75,7 @@ describe('BaseSwitch.vue', () => {
 
     // Should now be in "on" state
     expect(button.classes()).toContain('bg-blue-600');
-    expect(span.classes()).toContain('translate-x-6');
+    expect(span.classes()).toContain('translate-x-5');
 
     // Change back externally
     await wrapper.setProps({ modelValue: false });
